@@ -43,3 +43,30 @@ A simple ecommerce app with a range of product and categories
    - customer
    - orderItems (list of products and quantities)
    - address
+
+## Hospital Management Model
+
+1. Doctor
+   - name
+   - salary
+   - qualifications
+   - experienceInYears
+   - worksInHospital [List of hospitals]
+2. Patient
+   - name
+   - diagnosedWith
+   - age
+   - gender
+   - address
+   - blood group
+   - admitted In (Hospital ref)
+3. Hospital
+   - name
+   - addressLine1
+   - addressLine2
+   - city
+   - pincode
+   - specializedIn (Array of String)
+4. Medical Records
+   - patient (ref patient)
+   - illness ( illness name and description ) Array
