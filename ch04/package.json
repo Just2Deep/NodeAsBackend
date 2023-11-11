@@ -1,0 +1,14 @@
+{
+  "name": "ch04",
+  "version": "1.0.0",
+  "description": "1. User\r    - username\r    - email\r    - password\r 2. Todo\r    - title\r    - color\r    - createdBy - (User)\r    - sub_todos - [ {sub-todo}, ]\r 3. Sub-Todo\r    - content\r    - creationTime\r    - completed",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Deep",
+  "license": "ISC",
+  "dependencies": {
+    "mongoose": "^8.0.0"
+  }
+}
