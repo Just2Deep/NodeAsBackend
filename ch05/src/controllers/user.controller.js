@@ -20,7 +20,8 @@ const generateAccessAndRefeshToken = async (userId) => {
     } catch (error) {
         throw new ApiError(
             500,
-            "Something went wrong while generating access and refresh token"
+            "Something went wrong while generating access and refresh token" +
+                error
         );
     }
 };
@@ -59,6 +60,7 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new ApiError(409, "username or email already exists.");
     }
 
+    // console.log("avatar", req.files);
     const avatarLocalPath = req.files?.avatar[0]?.path;
     // const coverImageLocalPath = req.files?.coverImage[0]?.path;
     let coverImageLocalPath;
@@ -151,7 +153,7 @@ const loginUser = asyncHandler(async (req, res) => {
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            ApiResponse(
+            new ApiResponse(
                 200,
                 {
                     user: loggedInUser,
