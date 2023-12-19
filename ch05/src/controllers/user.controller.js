@@ -208,9 +208,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
             throw new ApiError(404, "Invalid refresh token");
         }
 
-        const user = await User.findById(decodedToken?._id).select(
-            "-password -refreshToken"
-        );
+        const user = await User.findById(decodedToken?._id);
 
         if (!user) {
             throw new ApiError(404, "Invalid refresh token");
@@ -243,6 +241,7 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
                 )
             );
     } catch (error) {
+        console.log(error);
         throw new ApiError(401, "refresh token does not exist", error);
     }
 });
