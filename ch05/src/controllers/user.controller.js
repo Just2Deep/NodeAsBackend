@@ -317,9 +317,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         throw new ApiError(500, "Error while uploading avatar");
     }
 
-    const avatarUrlToDelete = await User.findById(req.user?._id).select(
-        "avatar"
-    );
+    const deleteAvatar = await User.findById(req.user?._id).select("avatar");
 
     const user = await User.findByIdAndUpdate(
         req.user?._id,
@@ -331,7 +329,7 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
         { new: true }
     ).select("-password -refreshToken");
 
-    await deleteFromCloudinary(avatarUrlToDelete.avatar);
+    await deleteFromCloudinary(deleteAvatar?.avatar);
 
     return res
         .status(200)
