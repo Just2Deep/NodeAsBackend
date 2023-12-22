@@ -1,5 +1,6 @@
 import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
+import path from "path";
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -26,4 +27,18 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 };
 
-export { uploadOnCloudinary };
+const deleteFromCloudinary = async (url) => {
+    try {
+        const publicId = path.parse(url).name;
+        if (!publicId) return null;
+
+        const response = await cloudinary.uploader.destroy(publicId);
+        return response;
+    } catch (error) {
+        // operation failed
+        console.log(`Error ${error}`);
+        return null;
+    }
+};
+
+export { uploadOnCloudinary, deleteFromCloudinary };
