@@ -2,6 +2,14 @@ import mongoose, { Schema } from "mongoose";
 
 const playlistSchema = new Schema(
     {
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+        },
+        description: {
+            type: String,
+        },
         owner: {
             type: Schema.Types.ObjectId,
             ref: "User",
@@ -12,14 +20,6 @@ const playlistSchema = new Schema(
                 ref: "Video",
             },
         ],
-        name: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        description: {
-            type: String,
-        },
     },
     { timestamps: true }
 );
