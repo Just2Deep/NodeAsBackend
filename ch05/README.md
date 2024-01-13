@@ -31,3 +31,31 @@ npm i
 ```
 npm run dev
 ```
+
+### API endpoints
+
+### Users
+
+-   register
+-   login
+-   refresh token
+-   change password
+-   me
+-   update account
+-   update cover
+-   update avatar
+-   get channel profile
+-   get watch history
+
+### Subscriptions (/subscriptions)
+
+-   subscribe
+-   unsubscribe
+
+### Tweets (/tweets)
+
+-   create new tweet
+-   update tweet
+-   delete tweet
+-   get tweet
+-   get all tweets by user
