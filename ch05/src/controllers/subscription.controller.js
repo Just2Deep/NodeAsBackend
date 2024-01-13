@@ -65,7 +65,7 @@ const unSubscribeToChannel = asyncHandler(async (req, res) => {
     });
 
     if (!unsubscribe) {
-        throw new ApiError(500, "could not find subscription");
+        throw new ApiError(400, "could not find subscription");
     }
 
     return res
