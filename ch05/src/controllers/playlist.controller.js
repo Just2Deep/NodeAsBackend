@@ -41,20 +41,27 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "Incorrect data");
     }
 
-    const playlistToAdd = await Playlist.findOne({
-        _id: playlistId,
-        owner: req.user?._id,
-    });
+    const playlistToAdd = await Playlist.findOne(
+        {
+            _id: playlistId,
+            owner: req.user?._id,
+        },
+        { new: true }
+    );
 
     if (!playlistToAdd) {
         throw new ApiError(400, "playlist does not exist");
     }
 
-    const updatedPlaylist = await Playlist.findByIdAndUpdate(playlistId, {
-        $addToSet: {
-            videos: videoId,
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+            $addToSet: {
+                videos: videoId,
+            },
         },
-    });
+        { new: true }
+    );
 
     if (!updatedPlaylist) {
         throw new ApiError(500, "error while updating playlist");
@@ -87,7 +94,8 @@ const updatePlaylistDetails = asyncHandler(async (req, res) => {
                 name: playlistName,
                 description: playlistDescription,
             },
-        }
+        },
+        { new: true }
     );
 
     if (!playlistToUpdate) {
@@ -123,9 +131,57 @@ const getPlaylist = asyncHandler(async (req, res) => {
         );
 });
 
+const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+    const { videoId } = req.body;
+
+    if (!videoId || !playlistId) {
+        throw new ApiError(400, "all fields are required");
+    }
+
+    if (
+        !mongoose.isValidObjectId(videoId) ||
+        !mongoose.isValidObjectId(playlistId)
+    ) {
+        throw new ApiError(400, "Incorrect data");
+    }
+
+    const playlistToRemove = await Playlist.findOne({
+        _id: playlistId,
+        owner: req.user?._id,
+    });
+
+    if (!playlistToRemove) {
+        throw new ApiError(400, "playlist does not exist");
+    }
+
+    const updatedPlaylist = await Playlist.findByIdAndUpdate(
+        playlistId,
+        {
+            $pull: {
+                videos: videoId,
+            },
+        },
+        { new: true }
+    );
+
+    if (!updatedPlaylist) {
+        throw new ApiError(500, "error while updating playlist");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, updatedPlaylist, "video removed from playlist")
+        );
+});
+
+const deletePlaylist = asyncHandler(async (req, res) => {});
 export {
     createNewPlaylist,
     addVideoToPlaylist,
+    removeVideoFromPlaylist,
     updatePlaylistDetails,
     getPlaylist,
+    deletePlaylist,
 };
