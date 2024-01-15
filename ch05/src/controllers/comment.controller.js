@@ -111,4 +111,75 @@ const getComment = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, comment, "comment fetched successfully."));
 });
 
-export { addComment, updateComment, deleteComment, getComment };
+const getVideoComments = asyncHandler(async (req, res) => {
+    const { videoId } = req.params;
+    const { page = 1, limit = 10 } = req.query;
+
+    const customLabels = {
+        totalDocs: "commentCount",
+        docs: "commentsList",
+        limit: "commentsPerPage",
+        page: "currentPage",
+        nextPage: "next",
+        prevPage: "prev",
+        totalPages: "totalComments",
+        hasPrevPage: "hasPrev",
+        hasNextPage: "hasNext",
+        pagingCounter: "pageCounter",
+        meta: "paginator",
+    };
+
+    const options = { page, limit, customLabels };
+
+    if (!mongoose.isValidObjectId(videoId)) {
+        throw new ApiError(400, "invalid video id");
+    }
+
+    // Define your aggregate.
+    const comments = Comment.aggregate([
+        { $match: { video: new mongoose.Types.ObjectId(videoId) } },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullName: 1,
+                            username: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                owner: {
+                    $first: "$owner",
+                },
+            },
+        },
+    ]);
+
+    Comment.aggregatePaginate(comments, options)
+        .then(function (result) {
+            return res
+                .status(200)
+                .json(new ApiResponse(200, result, "fetched comments"));
+        })
+        .catch(function (err) {
+            console.log(err);
+            throw new ApiError(500, "error getting comments");
+        });
+});
+
+export {
+    addComment,
+    updateComment,
+    deleteComment,
+    getComment,
+    getVideoComments,
+};

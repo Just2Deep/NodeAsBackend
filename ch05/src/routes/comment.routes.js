@@ -3,17 +3,16 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import {
     addComment,
     deleteComment,
-    getComment,
+    // getComment,
     updateComment,
+    getVideoComments,
 } from "../controllers/comment.controller.js";
 
 const router = Router();
 
 router.use(verifyJWT);
 
-router.route("/new/:videoId").post(addComment);
-router.route("/update/:commentId").patch(updateComment);
-router.route("/get/:commentId").get(getComment);
-router.route("/delete/:commentId").delete(deleteComment);
+router.route("/:videoId").post(addComment).get(getVideoComments);
+router.route("/c/:commentId").patch(updateComment).delete(deleteComment);
 
 export default router;
