@@ -10,10 +10,10 @@ import {
 
 const router = Router();
 
-router.route("/new").post(verifyJWT, createNewTweet);
-router.route("/get/:tweetId").get(getTweet);
-router.route("/get-all/:userId").get(getAllTweetsByUser);
-router.route("/delete/:tweetId").delete(verifyJWT, deleteTweet);
-router.route("/update/:tweetId").patch(verifyJWT, updateTweet);
+router.use(verifyJWT);
+
+router.route("/").post(createNewTweet);
+router.route("/:tweetId").get(getTweet).patch(updateTweet).delete(deleteTweet);
+router.route("/user/:userId").get(getAllTweetsByUser);
 
 export default router;

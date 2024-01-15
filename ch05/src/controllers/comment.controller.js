@@ -93,23 +93,23 @@ const deleteComment = asyncHandler(async (req, res) => {
         .json(new ApiResponse(204, {}, "comment deleted successfully"));
 });
 
-const getComment = asyncHandler(async (req, res) => {
-    const { commentId } = req.params;
+// const getComment = asyncHandler(async (req, res) => {
+//     const { commentId } = req.params;
 
-    if (!mongoose.isValidObjectId(commentId)) {
-        throw new ApiError(400, "invalid comment id");
-    }
+//     if (!mongoose.isValidObjectId(commentId)) {
+//         throw new ApiError(400, "invalid comment id");
+//     }
 
-    const comment = await Comment.findById(commentId);
+//     const comment = await Comment.findById(commentId);
 
-    if (!comment) {
-        throw new ApiError(400, "comment does not exist");
-    }
+//     if (!comment) {
+//         throw new ApiError(400, "comment does not exist");
+//     }
 
-    return res
-        .status(201)
-        .json(new ApiResponse(200, comment, "comment fetched successfully."));
-});
+//     return res
+//         .status(201)
+//         .json(new ApiResponse(200, comment, "comment fetched successfully."));
+// });
 
 const getVideoComments = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
@@ -180,6 +180,6 @@ export {
     addComment,
     updateComment,
     deleteComment,
-    getComment,
+    // getComment,
     getVideoComments,
 };
