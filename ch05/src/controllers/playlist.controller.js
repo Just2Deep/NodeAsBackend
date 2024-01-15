@@ -5,15 +5,15 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
 const createNewPlaylist = asyncHandler(async (req, res) => {
-    const { playlistName, playlistDescription } = req.body;
+    const { name, description } = req.body;
 
-    if (!playlistName) {
+    if (!name) {
         throw new ApiError(400, "name is required!");
     }
 
     const playlist = await Playlist.create({
-        name: playlistName,
-        description: playlistDescription || "",
+        name: name,
+        description: description || "",
         owner: req.user?._id,
     });
 
@@ -27,8 +27,7 @@ const createNewPlaylist = asyncHandler(async (req, res) => {
 });
 
 const addVideoToPlaylist = asyncHandler(async (req, res) => {
-    const { playlistId } = req.params;
-    const { videoId } = req.body;
+    const { playlistId, videoId } = req.params;
 
     if (!videoId || !playlistId) {
         throw new ApiError(400, "all fields are required");
@@ -74,9 +73,9 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
 
 const updatePlaylistDetails = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
-    const { playlistName, playlistDescription } = req.body;
+    const { name, description } = req.body;
 
-    if (!playlistName || !playlistDescription) {
+    if (!name || !description) {
         throw new ApiError(400, "all fields are required");
     }
 
@@ -91,8 +90,8 @@ const updatePlaylistDetails = asyncHandler(async (req, res) => {
         },
         {
             $set: {
-                name: playlistName,
-                description: playlistDescription,
+                name: name,
+                description: description,
             },
         },
         { new: true }
@@ -108,7 +107,7 @@ const updatePlaylistDetails = asyncHandler(async (req, res) => {
         );
 });
 
-const getPlaylist = asyncHandler(async (req, res) => {
+const getPlaylistById = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
 
     if (!mongoose.isValidObjectId(playlistId)) {
@@ -132,8 +131,7 @@ const getPlaylist = asyncHandler(async (req, res) => {
 });
 
 const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
-    const { playlistId } = req.params;
-    const { videoId } = req.body;
+    const { playlistId, videoId } = req.params;
 
     if (!videoId || !playlistId) {
         throw new ApiError(400, "all fields are required");
@@ -197,11 +195,34 @@ const deletePlaylist = asyncHandler(async (req, res) => {
         .json(new ApiResponse(200, {}, "playlist deleted successfully!"));
 });
 
+const getUserPlaylists = asyncHandler(async (req, res) => {
+    const { userId } = req.params;
+
+    if (!userId && !mongoose.isValidObjectId(userId)) {
+        throw new ApiError(400, "user id invalid");
+    }
+
+    const playlists = await Playlist.find({
+        owner: userId,
+    });
+
+    if (!playlists) {
+        throw new ApiError(400, "playlists do not exist");
+    }
+
+    return res
+        .status(200)
+        .json(
+            new ApiResponse(200, playlists, "playlists fetched successfully!")
+        );
+});
+
 export {
     createNewPlaylist,
     addVideoToPlaylist,
     removeVideoFromPlaylist,
     updatePlaylistDetails,
-    getPlaylist,
+    getPlaylistById,
     deletePlaylist,
+    getUserPlaylists,
 };
