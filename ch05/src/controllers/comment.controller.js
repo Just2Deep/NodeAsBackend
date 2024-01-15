@@ -1,8 +1,8 @@
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { Comment } from "../models/comment.model";
-import { Video } from "../models/video.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { Comment } from "../models/comment.model.js";
+import { Video } from "../models/video.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
 const addComment = asyncHandler(async (req, res) => {
@@ -93,4 +93,22 @@ const deleteComment = asyncHandler(async (req, res) => {
         .json(new ApiResponse(204, {}, "comment deleted successfully"));
 });
 
-export { addComment, updateComment, deleteComment };
+const getComment = asyncHandler(async (req, res) => {
+    const { commentId } = req.params;
+
+    if (!mongoose.isValidObjectId(commentId)) {
+        throw new ApiError(400, "invalid comment id");
+    }
+
+    const comment = await Comment.findById(commentId);
+
+    if (!comment) {
+        throw new ApiError(400, "comment does not exist");
+    }
+
+    return res
+        .status(201)
+        .json(new ApiResponse(200, comment, "comment fetched successfully."));
+});
+
+export { addComment, updateComment, deleteComment, getComment };

@@ -1,7 +1,7 @@
-import { ApiError } from "../utils/ApiError";
-import { ApiResponse } from "../utils/ApiResponse";
-import { Playlist } from "../models/playlist.model";
-import { asyncHandler } from "../utils/asyncHandler";
+import { ApiError } from "../utils/ApiError.js";
+import { ApiResponse } from "../utils/ApiResponse.js";
+import { Playlist } from "../models/playlist.model.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 
 const createNewPlaylist = asyncHandler(async (req, res) => {
@@ -176,7 +176,27 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         );
 });
 
-const deletePlaylist = asyncHandler(async (req, res) => {});
+const deletePlaylist = asyncHandler(async (req, res) => {
+    const { playlistId } = req.params;
+
+    if (!mongoose.isValidObjectId(playlistId)) {
+        throw new ApiError(400, "Incorrect data");
+    }
+
+    const playlistToRemove = await Playlist.findOneAndDelete({
+        _id: playlistId,
+        owner: req.user?._id,
+    });
+
+    if (!playlistToRemove) {
+        throw new ApiError(400, "playlist does not exist");
+    }
+
+    return res
+        .status(200)
+        .json(new ApiResponse(200, {}, "playlist deleted successfully!"));
+});
+
 export {
     createNewPlaylist,
     addVideoToPlaylist,
