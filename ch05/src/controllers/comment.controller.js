@@ -3,7 +3,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { Comment } from "../models/comment.model.js";
 import { Video } from "../models/video.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 const addComment = asyncHandler(async (req, res) => {
     const { content } = req.body;
@@ -13,11 +13,14 @@ const addComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "content is required!");
     }
 
-    if (!mongoose.isValidObjectId(videoId)) {
+    if (!isValidObjectId(videoId)) {
         throw new ApiError(400, "invalid video id");
     }
 
-    const videoToAddComment = await Video.findById(videoId);
+    const videoToAddComment = await Video.findOne({
+        _id: videoId,
+        isPublished: true,
+    });
 
     if (!videoToAddComment) {
         throw new ApiError(400, "video does not exist");
@@ -46,12 +49,12 @@ const updateComment = asyncHandler(async (req, res) => {
         throw new ApiError(400, "content is required!");
     }
 
-    if (!mongoose.isValidObjectId(commentId)) {
+    if (!isValidObjectId(commentId)) {
         throw new ApiError(400, "invalid comment id");
     }
 
-    const comment = await Comment.findByIdAndUpdate(
-        commentId,
+    const comment = await Comment.findOneAndUpdate(
+        { _id: commentId, owner: req.user?._id },
         {
             $set: {
                 content: content,
@@ -72,18 +75,14 @@ const updateComment = asyncHandler(async (req, res) => {
 const deleteComment = asyncHandler(async (req, res) => {
     const { commentId } = req.params;
 
-    if (!mongoose.isValidObjectId(commentId)) {
+    if (!isValidObjectId(commentId)) {
         throw new ApiError(400, "invalid comment id");
     }
 
     const comment = await Comment.findById(commentId);
 
-    if (!comment) {
+    if (!(comment && comment.owner.equals(req.user?._id))) {
         throw new ApiError(400, "comment does not exist");
-    }
-
-    if (!(comment.owner != req.user?._id)) {
-        throw new ApiError(401, "you cannot delete others comment.");
     }
 
     await Comment.deleteOne({ _id: comment._id });
@@ -96,7 +95,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 // const getComment = asyncHandler(async (req, res) => {
 //     const { commentId } = req.params;
 
-//     if (!mongoose.isValidObjectId(commentId)) {
+//     if (!isValidObjectId(commentId)) {
 //         throw new ApiError(400, "invalid comment id");
 //     }
 
@@ -131,7 +130,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
 
     const options = { page, limit, customLabels };
 
-    if (!mongoose.isValidObjectId(videoId)) {
+    if (!isValidObjectId(videoId)) {
         throw new ApiError(400, "invalid video id");
     }
 

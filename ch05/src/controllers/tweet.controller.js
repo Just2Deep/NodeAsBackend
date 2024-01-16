@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 import { Tweet } from "../models/tweet.model.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -29,7 +29,7 @@ const deleteTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "tweet id is required!");
     }
 
-    if (!mongoose.isValidObjectId(tweetId)) {
+    if (!isValidObjectId(tweetId)) {
         throw new ApiError(400, "Invalid tweet id!");
     }
 
@@ -55,7 +55,7 @@ const updateTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "all fields are required!");
     }
 
-    if (!mongoose.isValidObjectId(tweetId)) {
+    if (!isValidObjectId(tweetId)) {
         throw new ApiError(400, "Invalid tweet id!");
     }
 
@@ -90,7 +90,7 @@ const getTweet = asyncHandler(async (req, res) => {
         throw new ApiError(400, "all fields are required!");
     }
 
-    if (!mongoose.isValidObjectId(tweetId)) {
+    if (!isValidObjectId(tweetId)) {
         throw new ApiError(400, "Invalid tweet id!");
     }
 
@@ -112,7 +112,7 @@ const getAllTweetsByUser = asyncHandler(async (req, res) => {
         throw new ApiError(400, "user id is required");
     }
 
-    if (!mongoose.isValidObjectId(userId)) {
+    if (!isValidObjectId(userId)) {
         throw new ApiError(400, "invalid user id!");
     }
 

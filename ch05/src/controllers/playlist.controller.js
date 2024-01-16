@@ -2,7 +2,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { Playlist } from "../models/playlist.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
-import mongoose from "mongoose";
+import { isValidObjectId } from "mongoose";
 
 const createNewPlaylist = asyncHandler(async (req, res) => {
     const { name, description } = req.body;
@@ -33,10 +33,7 @@ const addVideoToPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "all fields are required");
     }
 
-    if (
-        !mongoose.isValidObjectId(videoId) ||
-        !mongoose.isValidObjectId(playlistId)
-    ) {
+    if (!isValidObjectId(videoId) || !isValidObjectId(playlistId)) {
         throw new ApiError(400, "Incorrect data");
     }
 
@@ -79,7 +76,7 @@ const updatePlaylistDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, "all fields are required");
     }
 
-    if (!mongoose.isValidObjectId(playlistId)) {
+    if (!isValidObjectId(playlistId)) {
         throw new ApiError(400, "Incorrect playlist id");
     }
 
@@ -110,7 +107,7 @@ const updatePlaylistDetails = asyncHandler(async (req, res) => {
 const getPlaylistById = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
 
-    if (!mongoose.isValidObjectId(playlistId)) {
+    if (!isValidObjectId(playlistId)) {
         throw new ApiError(400, "Incorrect playlist id");
     }
 
@@ -137,10 +134,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
         throw new ApiError(400, "all fields are required");
     }
 
-    if (
-        !mongoose.isValidObjectId(videoId) ||
-        !mongoose.isValidObjectId(playlistId)
-    ) {
+    if (!isValidObjectId(videoId) || !isValidObjectId(playlistId)) {
         throw new ApiError(400, "Incorrect data");
     }
 
@@ -177,7 +171,7 @@ const removeVideoFromPlaylist = asyncHandler(async (req, res) => {
 const deletePlaylist = asyncHandler(async (req, res) => {
     const { playlistId } = req.params;
 
-    if (!mongoose.isValidObjectId(playlistId)) {
+    if (!isValidObjectId(playlistId)) {
         throw new ApiError(400, "Incorrect data");
     }
 
@@ -198,7 +192,7 @@ const deletePlaylist = asyncHandler(async (req, res) => {
 const getUserPlaylists = asyncHandler(async (req, res) => {
     const { userId } = req.params;
 
-    if (!userId && !mongoose.isValidObjectId(userId)) {
+    if (!userId && !isValidObjectId(userId)) {
         throw new ApiError(400, "user id invalid");
     }
 
