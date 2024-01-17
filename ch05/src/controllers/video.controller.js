@@ -16,7 +16,70 @@ const getImageExtensionOfVideo = (filename) => {
 
 const getAllVideos = asyncHandler(async (req, res) => {
     const { page = 1, limit = 10, query, sortBy, sortType, userId } = req.query;
-    //TODO: get all videos based on query, sort, pagination
+
+    const sortOptions = ["views", "duration", "title"];
+    let sortByVar;
+
+    if (!sortOptions.includes(sortBy)) {
+        sortByVar = "views";
+    } else {
+        sortByVar = sortBy;
+    }
+
+    let sort = {};
+    sort[sortByVar] = sortType == "desc" ? -1 : 1;
+
+    const searchQuery = Video.aggregate([
+        {
+            $match: {
+                isPublished: true,
+                $or: [
+                    { title: { $regex: query, $options: "i" } },
+                    { description: { $regex: query, $options: "i" } },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: "users",
+                localField: "owner",
+                foreignField: "_id",
+                as: "owner",
+                pipeline: [
+                    {
+                        $project: {
+                            fullName: 1,
+                            username: 1,
+                            avatar: 1,
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $addFields: {
+                owner: {
+                    $first: "$owner",
+                },
+            },
+        },
+        { $sort: sort },
+    ]);
+
+    const options = { page, limit };
+
+    Video.aggregatePaginate(searchQuery, options)
+        .then(function (result) {
+            return res
+                .status(200)
+                .json(
+                    new ApiResponse(200, result, "fetched videos successfull!")
+                );
+        })
+        .catch(function (err) {
+            console.log(err);
+            throw new ApiError(500, "error getting videos!");
+        });
 });
 
 const publishAVideo = asyncHandler(async (req, res) => {
