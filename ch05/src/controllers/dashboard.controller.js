@@ -8,7 +8,6 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { User } from "../models/user.model.js";
 
 const getChannelStats = asyncHandler(async (req, res) => {
-    // TODO: Get the channel stats like total video views, total subscribers, total videos, total likes etc.
     const { channelId } = req.params;
 
     if (!isValidObjectId(channelId)) {
@@ -28,6 +27,11 @@ const getChannelStats = asyncHandler(async (req, res) => {
                 foreignField: "owner",
                 as: "allVideos",
                 pipeline: [
+                    {
+                        $match: {
+                            isPublished: true,
+                        },
+                    },
                     {
                         $lookup: {
                             from: "likes",
